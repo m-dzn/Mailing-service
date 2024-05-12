@@ -31,12 +31,17 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third-party apps
+
+    # Local apps
 ]
 
 MIDDLEWARE = [
@@ -72,11 +77,19 @@ WSGI_APPLICATION = 'mailling_service.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
+# DB 커넥션을 설정합니다. 로컬 개발 시 해당 DB를 설치하고 아래에 설정된 Database와 계정(mailing_service, mailing_admin)을 새로 만들어야 합니다.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mailing_service',
+        'USER': 'mailing_admin',
+        'PASSWORD': 'admin1!',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {
+            'autocommit': True,
+            'charset': 'utf8mb4',
+        }
     }
 }
 
@@ -102,10 +115,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
+# 다국어 지원 관련 설정을 하는 곳 입니다. 언어와 타임존을 설정 합니다.
+LANGUAGE_CODE = 'ko-kr'
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -114,10 +127,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
-
+# 정적 파일 요청이 오는 URL을 정의합니다. (ex: ~/static/images/logo.png)
 STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
+# AUTO INCREMENT 되는 PK를 BIGINT(최대 922경) 타입으로 정의합니다.
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
