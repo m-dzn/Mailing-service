@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% load static %}
+{% block head %}
+    <!-- Home styles -->
+    <link rel="stylesheet" href="{% static 'css/home/home.css' %}">
+
+    <!-- Home scripts -->
+{% endblock %}
+
+{% block body %}
+    {% load socialaccount %}
+
+    <main>
+        <h2>Home</h2>
+
+        {% if user.is_authenticated %}
+        <p>You are signed in as {{user.email}}</p>
+        {% endif %}
+
+        <div class="learning-material-list infinite-container">
+            {% for learning_material in learning_materials %}
+                <article class="learning-material-item infinite-item">
+                    <div>{{ learning_material.id }}</div>
+                    <div>{{ learning_material.title }}</div>
+                    <div>{{ learning_material.original_filename }}</div>
+                    <div>{{ learning_material.file_path }}</div>
+                </article>
+            {% endfor %}
+        </div>
+        {% if page_obj.has_next %}
+            <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}">더보기</a>
+        {% endif %}
+        <div class="d-flex justify-content-center" style="display:none;">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+
+        <div>
+            ￦ 25,000원
+            <button>결제하기</button>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'js/infinite.min.js' %}"></script>
+    <script>
+        const infinite = new Waypoint.Infinite({
+            element: $('.infinite-container')[0],
+            offset: 'bottom-in-view',
+            handler: function(direction) {
+            },
+            onBeforePageLoad: function() {
+                $('.spinner-border').show();
+            },
+            onAfterPageLoad: function() {
+                $('.spinner-border').hide();
+            }
+        });
+    </script>
+{% endblock %}

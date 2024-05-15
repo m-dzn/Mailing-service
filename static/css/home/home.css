@@ -1,0 +1,12 @@
+.learning-material-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    column-gap: 40px;
+}
+
+.learning-material-item {
+    height: 50vh;
+    background: wheat;
+    margin: 40px 0;
+    overflow: hidden;
+}

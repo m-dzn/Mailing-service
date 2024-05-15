@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 from core.utils import CustomJSONEncoder, upload_file, remove_file
 from learning_material.models import LearningMaterial
@@ -16,11 +17,9 @@ def get_or_create_learning_materials(request):
     if request.method == 'GET':
         learning_materials = (
             LearningMaterial.objects.filter(is_deleted=False).all()
-            .values('id', 'title', 'price', 'description',
-                    'file_path', 'original_filename', 'extension', 'file_size',
-                    'created_at', 'updated_at')
             .order_by('-id')
         )
+
         return JsonResponse(
             status=HTTPStatus.OK,
             data=list(learning_materials),
@@ -50,7 +49,7 @@ def get_or_create_learning_materials(request):
             description=description,
             price=price,
             file_path=uploaded_file_info.get('file_path'),
-            original_filename=file.name,
+            original_filename=uploaded_file_info.get('original_filename'),
             stored_filename=uploaded_file_info.get('stored_filename'),
             extension=uploaded_file_info.get('extension'),
             file_size=uploaded_file_info.get('file_size'),
