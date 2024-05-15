@@ -4,10 +4,9 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
-from core.utils import CustomJSONEncoder, upload_file, remove_file
-from learning_material.models import LearningMaterial
+from app.utils import CustomJSONEncoder, upload_file, remove_file
+from app.models import LearningMaterial
 
 
 LEARNING_MATERIAL_STATIC_DIRECTORY = 'learning-material'

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Mailing Service | Admin
+{% endblock %}
+
+{% load static %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">
+{% endblock %}
+
+{% block body %}
+    <div class="wrap">
+        {% include 'admin/admin-sidebar.html' %}
+        <main>
+            어드민
+        </main>
+    </div>
+{% endblock %}

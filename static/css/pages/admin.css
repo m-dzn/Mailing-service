@@ -1,0 +1,10 @@
+.wrap {
+    display: flex;
+    flex: 1;
+}
+
+.admin-sidebar {
+    background: #232323;
+    color: #ffffff;
+    width: 240px;
+}

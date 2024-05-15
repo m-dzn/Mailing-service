@@ -1,7 +1,7 @@
 import os
 
 SITE_ID = 1
-AUTH_USER_MODEL = 'user.CustomUser'
+AUTH_USER_MODEL = 'app.CustomUser'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {

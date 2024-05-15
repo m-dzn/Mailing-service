@@ -1,5 +1,5 @@
 from django.db import models
-from core.models import BaseModel
+from app.models.abstract_models import BaseModel
 
 
 class LearningMaterial(BaseModel):
@@ -14,7 +14,7 @@ class LearningMaterial(BaseModel):
     file_size = models.BigIntegerField(null=False)
 
     class Meta:
-        db_table = 'learning_material'
+        db_table = 'app'
 
     def __str__(self):
         return self.original_filename

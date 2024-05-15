@@ -3,7 +3,7 @@ ASGI config for mailing_service project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
-For more information on this learning_material, see
+For more information on this app, see
 https://docs.djangoproject.com/en/5.0/howto/deployment/asgi/
 """
 

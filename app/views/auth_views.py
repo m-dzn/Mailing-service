@@ -2,8 +2,12 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import logout
 
 
-def index(request):
-    return render(request, 'home/home.html')
+def home(request):
+    return render(request, 'pages/pages.html')
+
+
+def admin(request):
+    return render(request, 'admin/admin.html')
 
 
 def logout_view(request):
