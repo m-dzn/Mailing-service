@@ -3,7 +3,7 @@ from django.contrib.auth import logout
 
 
 def home(request):
-    return render(request, 'pages/pages.html')
+    return render(request, 'home/home.html')
 
 
 def admin(request):
