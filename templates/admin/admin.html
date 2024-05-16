@@ -1,19 +1,111 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}
 Mailing Service | Admin
 {% endblock %}
 
-{% load static %}
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/pages/admin.css' %}">
 {% endblock %}
 
 {% block body %}
     <div class="wrap">
-        {% include 'admin/admin-sidebar.html' %}
+<!--        {% include 'admin/admin-sidebar.html' %}-->
         <main>
-            어드민
+            <section class="admin-main-grid">
+                {% include 'admin/admin-order-card.html' %}
+                {% include 'admin/admin-learning-material-card.html' %}
+            </section>
         </main>
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        setEventListeners();
+    });
+
+    function setEventListeners() {
+        const $addLearningMaterialForm = $("#add-learning-material-form");
+        $addLearningMaterialForm.on("submit", function(event) {
+            event.preventDefault();
+
+            let formData = new FormData(this);
+
+            $.ajax({
+                url: "/api/learning-materials",
+                type: "POST",
+                data: formData,
+                processData: false,
+                success: function(response) {
+                    alert("학습 자료가 등록됐습니다.");
+                    $addLearningMaterialForm[0].reset();
+                },
+                error: function(response) {
+                    alert("학습 자료 등록 중 오류가 발생했습니다.");
+                }
+            });
+        });
+    }
+
+    function reloadLearningMaterialList() {
+        setTimeout(() => {
+            location.href = "/admin";
+        }, 200);
+    }
+
+    function getCsrfToken() {
+        return $("meta[name='csrf-token']").attr("content");
+    }
+
+    function editLearningMaterial(event) {
+        event.preventDefault();
+
+        const id = $(event.target).data("id");
+        const formData = new FormData(event.target);
+        const csrfToken = getCsrfToken();
+
+        $.ajax({
+            url: `/api/learning-materials/${id}`,
+            type: "PATCH",
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            },
+            success: function(response) {
+                alert("학습 자료가 수정됐습니다.");
+                location.reload();
+            },
+            error: function(response) {
+                alert("학습 자료 수정 중 오류가 발생했습니다.");
+            }
+        });
+    }
+
+
+    function removeLearningMaterial(id) {
+        if (confirm("정말 삭제하시겠습니까?")) {
+            let csrfToken = getCsrfToken();
+
+            $.ajax({
+                url: `/api/learning-materials/${id}`,
+                type: "DELETE",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                },
+                success: function(response) {
+                    alert("학습 자료가 삭제됐습니다.");
+                    location.reload();
+                },
+                error: function(response) {
+                    alert("학습 자료 삭제 중 오류가 발생했습니다.");
+                }
+            });
+        }
+    }
+</script>
 {% endblock %}

@@ -4,6 +4,7 @@ from http import HTTPStatus
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from rest_framework.decorators import api_view
 
 from app.utils import CustomJSONEncoder, upload_file, remove_file
 from app.models import LearningMaterial
@@ -69,6 +70,7 @@ def get_learning_material(learning_material_id):
         return None
 
 
+@api_view(['PATCH', 'DELETE'])
 def update_or_delete_learning_material(request, learning_material_id):
     if request.method == 'PATCH':
         # 데이터 조회
@@ -77,8 +79,18 @@ def update_or_delete_learning_material(request, learning_material_id):
         if learning_material is None:
             return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning material {learning_material_id} not found'))
 
-        body = json.loads(request.body)
-        LearningMaterial.objects.filter(id=learning_material_id).update(**body)
+        if 'file' in request.FILES:
+            remove_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
+            uploaded_file_info = upload_file(request.FILES['file'], LEARNING_MATERIAL_STATIC_DIRECTORY)
+        else:
+            uploaded_file_info = dict()
+
+        LearningMaterial.objects.filter(id=learning_material_id).update(
+            title=request.POST.get('title'),
+            description=request.POST.get('description'),
+            price=request.POST.get('price'),
+            **uploaded_file_info
+        )
         return JsonResponse(status=200, data=dict(result='OK'))
 
     elif request.method == 'DELETE':
@@ -89,7 +101,15 @@ def update_or_delete_learning_material(request, learning_material_id):
             return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning material {learning_material_id} not found'))
 
         # 소프트 딜리트
-        LearningMaterial.objects.filter(id=learning_material_id).update(is_deleted=True, deleted_at=timezone.now())
+        LearningMaterial.objects.filter(id=learning_material_id).update(
+            is_deleted=True,
+            deleted_at=timezone.now(),
+            file_path=None,
+            original_filename=None,
+            stored_filename=None,
+            extension=None,
+            file_size=None,
+        )
 
         remove_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
         return JsonResponse(status=HTTPStatus.OK, data=dict(result='OK'))

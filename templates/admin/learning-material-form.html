@@ -1,0 +1,23 @@
+<form class="card-body__form" id="{{ form_id }}" data-id="{{ learning_material.id }}" enctype="multipart/form-data" onsubmit="{{ onsubmit|default:'' }}">
+    {% csrf_token %}
+    <div class="input-container">
+        <input name="title" type="text" required="required" value="{{ learning_material.title }}"/>
+        <label class="label">Title</label>
+    </div>
+    <div class="input-container">
+        <input name="description" type="text" value="{{ learning_material.description }}" />
+        <label class="label">Description</label>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div class="input-container">
+            <input name="price" type="number" required="required" value="{{ learning_material.price|default:5000 }}" step="500" />
+            <label class="label">Price</label>
+        </div>
+        <div class="input-container">
+            <input name="file" type="file" {% if not learning_material.id %}required="required"{% endif %} />
+            <label class="label">File</label>
+        </div>
+    </div>
+
+    <button>{{ submit_button_label }}</button>
+</form>

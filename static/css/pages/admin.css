@@ -1,3 +1,9 @@
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
 .wrap {
     display: flex;
     flex: 1;
@@ -7,4 +13,21 @@
     background: #232323;
     color: #ffffff;
     width: 240px;
+}
+
+.admin-main-grid {
+    flex: 1;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 40px;
+    column-gap: 64px;
+}
+.admin-main-grid > *:nth-child(3) {
+    grid-row: 1 / span 2
+}
+
+/* ---------- Learning material Card ---------- */
+.learning-material-card:has(input#add-lm-nav:checked) .card-footer {
+    display: none;
 }

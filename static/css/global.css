@@ -1,4 +1,23 @@
+:root {
+    /* color */
+    --color-background: #eeeef4;
+    --color-surface: #ffffff;
+    --color-border-default: #bbbbbb;
+    --color-border-light: #e4e4e4;
+
+    --color-font-default: #222222;
+    --color-font-sub-dark: #55666a;
+    --color-font-sub-default: #999999;
+
+    --color-primary: #1596f4;
+
+    /* size */
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+}
+
 body {
+    background: var(--color-background);
     min-height: 100vh;
     margin: 0;
     display: flex;

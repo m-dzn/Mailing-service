@@ -1,0 +1,178 @@
+/* ---------- Card ---------- */
+.card {
+    --component-card-padding-horizontal: 24px;
+
+    background: var(--color-surface);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 1px 2px 2px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.card-header {
+    padding: 24px var(--component-card-padding-horizontal) 0;
+    display: flex;
+    gap: 8px;
+}
+.card-header__metadata {
+    flex: 1;
+    min-width: 0;
+}
+.card-header__metadata > * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.card-header__title {
+    margin: 0;
+    font-size: 20px;
+}
+.card-header__description {
+    color: var(--color-font-sub-default);
+    margin: 8px 0 0;
+    font-size: 13px;
+}
+
+.card-body {
+    padding: 24px var(--component-card-padding-horizontal);
+    flex: 1;
+}
+.card-body__form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.card-footer {
+    background: #f8f8f8;
+    color: var(--color-font-sub-dark);
+    overflow: hidden;
+    border-top: 1px solid var(--color-border-light);
+    padding: 12px var(--component-card-padding-horizontal);
+}
+
+/* ---------- Input ---------- */
+.input-container {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+}
+
+.input-container .label {
+    color: var(--color-font-sub-default);
+    font-size: 14px;
+}
+
+.input-container .label,
+.input-container input {
+    transition: all 0.3s ease;
+}
+
+.input-container input {
+    background-color: transparent;
+    min-width: 0;
+    outline: none;
+    padding: 6px 8px;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-sm);
+    font-size: 14px;
+}
+.input-container input::file-selector-button {
+    display: none;
+}
+.input-container input[type="file"]:not(:valid) {
+    color: var(--color-font-sub-default);
+}
+
+.input-container input:focus ~ .label {
+  color: var(--color-font-default);
+}
+.input-container input:focus {
+  border-color: var(--color-font-default);
+}
+
+.input-container .underline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 100%;
+  background-color: #333;
+  transform: scaleX(0);
+  transition: all 0.3s ease;
+}
+
+/* ---------- Input ---------- */
+.tab {
+    --component-tab-nav-button-width: 64px;
+}
+
+.tab-nav {
+    height: 36px;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, var(--component-tab-nav-button-width));
+    position: relative;
+
+    list-style: none;
+}
+.tab-nav::before {
+    content: '';
+    width: var(--component-tab-nav-button-width);
+    border-bottom: 2px solid var(--color-primary);
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: left 0.2s ease-out;
+}
+.tab-nav:has(.tab-nav-button:nth-of-type(2) input:checked)::before {
+    left: var(--component-tab-nav-button-width);
+}
+.tab-nav:has(.tab-nav-button:nth-of-type(1) input:checked) ~ .tab-pane:nth-of-type(1) {
+    display: block;
+}
+.tab-nav:has(.tab-nav-button:nth-of-type(2) input:checked) ~ .tab-pane:nth-of-type(2) {
+    display: block;
+}
+
+.tab-nav-button {
+    background: transparent;
+    color: var(--color-font-sub-default);
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    box-sizing: border-box;
+    outline: none;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+.tab-nav-button:hover,
+.tab-nav-button:has(input:checked) {
+    color: var(--color-primary);
+    font-weight: 500;
+}
+.tab-nav-button input {
+    display: none;
+}
+
+.tab-pane {
+    grid-column: 1 / -1;
+    display: none;
+    margin-top: 28px;
+}
+
+.tab-button {
+    font-size: 14px;
+}
+.tab-button label {
+    cursor: pointer;
+}
+.tab-button input {
+    display: none;
+}

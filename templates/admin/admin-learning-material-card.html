@@ -1,0 +1,52 @@
+{% load humanize %}
+{% load custom_filters %}
+
+<article class="card learning-material-card">
+    <header class="card-header">
+        <div class="card-header__metadata">
+            <h3 class="card-header__title">학습 자료</h3>
+            <p class="card-header__description">학습 자료 판매 설정을 여기서 할 수 있습니다.</p>
+        </div>
+    </header>
+    <div class="card-body">
+        <div class="tab">
+            <nav class="tab-nav">
+                <label for="lm-list-nav-button" class="tab-nav-button" onclick="reloadLearningMaterialList();">
+                    <input id="lm-list-nav-button" type="radio" name="lmTab" checked>
+                    리스트
+                </label>
+                <label for="add-lm-nav" class="tab-nav-button">
+                    <input id="add-lm-nav" type="radio" name="lmTab">
+                    추가
+                </label>
+            </nav>
+
+            <section id="lm-list-tab" class="tab-pane">
+                {% for learning_material in learning_materials %}
+                    <article>
+                        <div>{{ learning_material.title }}</div>
+                        <div>{{ learning_material.description }}</div>
+                        <div>{{ learning_material.price|intcomma }}원</div>
+                        <div>{{ learning_material.original_filename }}</div>
+                        <div>{{ learning_material.file_size|filesizeformat }}</div>
+                        <div>{{ learning_material.is_deleted }}</div>
+                        <div>{{ learning_material.extension }}</div>
+
+                        <button>수정</button>
+                        <button onclick="removeLearningMaterial({{ learning_material.id }})">삭제</button>
+
+                        {% include 'admin/learning-material-form.html' with form_id='edit-learning-material-form-'|addstr:learning_material.id submit_button_label='수정' onsubmit='editLearningMaterial(event);' %}
+                    </article>
+                {% endfor %}
+            </section>
+
+            <section id="add-lm-tab" class="tab-pane">
+                {% include 'admin/learning-material-form.html' with form_id='add-learning-material-form' submit_button_label='추가' %}
+            </section>
+        </div>
+    </div>
+
+    <footer class="card-footer">
+        Next
+    </footer>
+</article>
