@@ -34,7 +34,6 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # Django apps
     # 'django.contrib.admin', # 커스텀 유저 모델을 쓸 때는 제외하기
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -43,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'rest_framework',
 
-    # Third-party apps
+    # Auth
+    'django.contrib.auth',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -61,7 +61,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
+    'allauth.account.middleware.AccountMiddleware', # Auth
 ]
 
 ROOT_URLCONF = 'mailing_service.urls'
@@ -146,4 +146,4 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # AUTO INCREMENT 되는 PK를 BIGINT(최대 922경) 타입으로 정의합니다.
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 # 업로드 제한 용량 10MB

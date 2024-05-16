@@ -31,6 +31,7 @@
                         <div>{{ learning_material.file_size|filesizeformat }}</div>
                         <div>{{ learning_material.is_deleted }}</div>
                         <div>{{ learning_material.extension }}</div>
+                        <div>삭제 여부 true/false</div>
 
                         <button>수정</button>
                         <button onclick="removeLearningMaterial({{ learning_material.id }})">삭제</button>

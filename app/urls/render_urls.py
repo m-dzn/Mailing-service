@@ -3,8 +3,8 @@ from django.urls import path
 from app import views
 
 urlpatterns = [
-    path('', views.home, name='pages'),
+    path('', views.LearningMaterialView.as_view(), name='home'),
     path('admin/', views.admin, name='admin'),
     path('logout/', views.logout_view, name='logout'),
-    path('learning-materials/', views.LearningMaterialView.as_view(), name='learning-materials-ajax')
+    path('email/', views.send_email_test, name='email'),
 ]

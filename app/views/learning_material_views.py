@@ -23,16 +23,4 @@ def learning_materials_ajax(request):
             learning_materials = paginator.page(paginator.num_pages)
 
         context = {'learning_materials': learning_materials}
-        return render(request, 'pages/learning-materials-ajax.html', context)
-
-
-class LearningMaterialView(ListView):
-    model = LearningMaterial
-    paginate_by = 2
-    context_object_name = 'learning_materials'
-    template_name = 'pages/pages.html'
-    ordering = ['-id']
-
-    def get_queryset(self, **kwargs):
-        qs = super().get_queryset(**kwargs)
-        return qs.filter(is_deleted=False)
+        return render(request, 'home/home.html', context)

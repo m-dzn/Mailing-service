@@ -80,7 +80,9 @@ def update_or_delete_learning_material(request, learning_material_id):
             return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning material {learning_material_id} not found'))
 
         if 'file' in request.FILES:
-            remove_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
+            # 이미 저장된 파일이 있으면 삭제한 뒤 업로드합니다.
+            if learning_material.stored_filename:
+                remove_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
             uploaded_file_info = upload_file(request.FILES['file'], LEARNING_MATERIAL_STATIC_DIRECTORY)
         else:
             uploaded_file_info = dict()

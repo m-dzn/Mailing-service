@@ -1,3 +1,4 @@
+import os
 from uuid import uuid4
 from storages.backends.gcloud import GoogleCloudStorage
 
@@ -28,6 +29,19 @@ def upload_file(file, directory):
         }
     except Exception as e:
         raise e
+
+
+def get_file(filename, directory):
+    file_path = get_file_path(filename, directory)
+
+    bucket = storage.client.bucket(os.getenv('GS_BUCKET_NAME'))
+    blob = bucket.blob(file_path)
+
+    return blob.download_as_bytes()
+
+
+def get_file_path(filename, directory):
+    return (f'{directory}/' if directory is not None else '') + filename
 
 
 def remove_file(filename, directory):
