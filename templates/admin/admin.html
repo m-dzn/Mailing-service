@@ -25,6 +25,9 @@ Mailing Service | Admin
 <script>
     $(document).ready(function() {
         setEventListeners();
+        getOrders();
+        // createOrder();
+        checkOrderPayment();
     });
 
     function setEventListeners() {
@@ -60,6 +63,7 @@ Mailing Service | Admin
         return $("meta[name='csrf-token']").attr("content");
     }
 
+    /* Learning Material */
     function editLearningMaterial(event) {
         event.preventDefault();
 
@@ -86,7 +90,6 @@ Mailing Service | Admin
         });
     }
 
-
     function removeLearningMaterial(id) {
         if (confirm("정말 삭제하시겠습니까?")) {
             let csrfToken = getCsrfToken();
@@ -106,6 +109,60 @@ Mailing Service | Admin
                 }
             });
         }
+    }
+
+    /* Order */
+    function createOrder() {
+        let csrfToken = getCsrfToken();
+
+        $.ajax({
+            url: `/api/orders/`,
+            type: "POST",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            },
+            data: {
+                learning_materials: [6, 9]
+            }
+        });
+    }
+
+    function checkOrderPayment() {
+        const orderId = 1;
+        let csrfToken = getCsrfToken();
+
+        $.ajax({
+            url: `/api/orders/${orderId}/check-payment`,
+            type: "PATCH",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            },
+        });
+    }
+
+    function cancelOrder() {
+        const orderId = 1;
+        let csrfToken = getCsrfToken();
+
+        $.ajax({
+            url: `/api/orders/${orderId}/cancel`,
+            type: "PATCH",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            },
+        });
+    }
+
+    function getOrders() {
+        let csrfToken = getCsrfToken();
+
+        $.ajax({
+            url: `/api/orders`,
+            type: "GET",
+            beforeSend: function(xhr) {
+                xhr.setRequestHeader("X-CSRFToken", csrfToken);
+            },
+        });
     }
 </script>
 {% endblock %}

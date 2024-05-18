@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.views.generic.list import ListView
 
 from app.models import LearningMaterial
 
 
 def learning_materials_ajax(request):
     if request.method == 'GET':
-        page = request.GET.get('page', '1')
+        page = request.GET.get('page')
 
         learning_materials_data = (
             LearningMaterial.objects.filter(is_deleted=False).all()
@@ -22,5 +21,6 @@ def learning_materials_ajax(request):
         except EmptyPage:
             learning_materials = paginator.page(paginator.num_pages)
 
-        context = {'learning_materials': learning_materials}
-        return render(request, 'home/home.html', context)
+        return render(request, 'home/home.html', {
+            'learning_materials': learning_materials
+        })
