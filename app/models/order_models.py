@@ -1,7 +1,6 @@
 from django.db import models
 
 from .abstract_models import BaseModel
-from .learning_material_models import LearningMaterial
 from .user_models import CustomUser
 
 
@@ -17,5 +16,8 @@ class Order(BaseModel):
     paid_at = models.DateTimeField(null=True)
     canceled_at = models.DateTimeField(null=True)
 
-    learning_materials = models.ManyToManyField(LearningMaterial)
+    learning_materials = models.ManyToManyField('LearningMaterial')
     user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING, related_name='orders', null=False)
+
+    class Meta:
+        db_table = 'order'

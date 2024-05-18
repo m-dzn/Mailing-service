@@ -6,5 +6,4 @@ urlpatterns = [
     path('', views.LearningMaterialView.as_view(), name='home'),
     path('admin/', views.admin, name='admin'),
     path('logout/', views.logout_view, name='logout'),
-    path('email/', views.send_email_test, name='email'),
 ]

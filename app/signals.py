@@ -9,4 +9,5 @@ def save_profile_image(sender, instance, **kwargs):
         picture_url = instance.extra_data['picture']
         user = instance.user
         user.avatar = picture_url
+        user.file_receiving_email = instance.extra_data['email']
         user.save()

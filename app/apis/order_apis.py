@@ -1,12 +1,14 @@
+import os
 from http import HTTPStatus
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from rest_framework import filters, pagination, permissions, viewsets
-from rest_framework.decorators import api_view
+from rest_framework import decorators, filters, pagination, permissions, viewsets
 
 from app.models import Order, LearningMaterial
 from app.serializers import OrderSerializer
+from app.thread import send_email_async, send_learning_material_email_async
+from app.utils import get_file
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -49,14 +51,15 @@ class OrderViewSet(viewsets.ModelViewSet):
 def get_order(order_id, user):
     # 업데이트 결과 조회
     try:
-        return Order.objects.get(id=order_id, user=user, is_deleted=False)
+        return (Order.objects.prefetch_related('learning_materials')
+                .get(id=order_id, user=user, is_deleted=False))
     except ObjectDoesNotExist:
         return None
     except MultipleObjectsReturned:
         return None
 
 
-@api_view(['PATCH'])
+@decorators.api_view(['PATCH'])
 def check_order_payment(request, order_id):
     if request.method == 'PATCH':
         # 데이터 조회
@@ -69,10 +72,23 @@ def check_order_payment(request, order_id):
             status=Order.ORDER_STATUS_CHOICES.get('PAID'),
             paid_at=timezone.now()
         )
+
+        learning_materials = order.learning_materials.all()
+
+        file_list = []
+        for learning_material in learning_materials:
+            file = get_file(learning_material.stored_filename, 'learning-material')
+            file_list.append((learning_material.original_filename, file))
+
+        send_learning_material_email_async(
+            [request.user.file_receiving_email],
+            file_list,
+        )
+
         return JsonResponse(status=200, data=dict(result='OK'))
 
 
-@api_view(['PATCH'])
+@decorators.api_view(['PATCH'])
 def cancel_order(request, order_id):
     if request.method == 'PATCH':
         # 데이터 조회

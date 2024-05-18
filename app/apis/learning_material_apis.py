@@ -1,34 +1,39 @@
-import json
-
+import urllib.parse
 from http import HTTPStatus
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404, HttpResponse
+from django.db.models import Prefetch
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from rest_framework.decorators import api_view
+from rest_framework import decorators, filters, pagination, permissions, views, viewsets
 
-from app.utils import CustomJSONEncoder, upload_file, remove_file
-from app.models import LearningMaterial
+
+from app.models import LearningMaterial, Order
+from app.serializers import LearningMaterialSerializer
+from app.thread import send_learning_material_email_async
+from app.utils import upload_file, remove_file, get_file, convert_files_into_zip
 
 
 LEARNING_MATERIAL_STATIC_DIRECTORY = 'learning-material'
 
 
-def get_or_create_learning_materials(request):
-    if request.method == 'GET':
-        learning_materials = (
-            LearningMaterial.objects.filter(is_deleted=False).all()
-            .order_by('-id')
-        )
+class LearningMaterialViewSet(viewsets.ModelViewSet):
+    serializer_class = LearningMaterialSerializer
+    pagination_class = pagination.PageNumberPagination
+    permission_classes = [permissions.AllowAny]
 
-        return JsonResponse(
-            status=HTTPStatus.OK,
-            data=list(learning_materials),
-            encoder=CustomJSONEncoder,
-            json_dumps_params={'ensure_ascii': False},
-            safe=False,
-        )
+    filter_backends = [filters.OrderingFilter]
 
-    elif request.method == 'POST':
+    ordering = ['-id']
+
+    def get_queryset(self):
+        is_superuser = self.request.user.is_superuser
+        if is_superuser:
+            return LearningMaterial.objects.all()
+        else:
+            order_queryset = Order.objects.filter(user=self.request.user)
+            prefetch = Prefetch('orders', queryset=order_queryset)
+            return LearningMaterial.objects.filter(is_deleted=False).all()
+
+    def create(self, request, *args, **kwargs):
         # 필수 값(required)
         title = request.POST.get('title')
         price = request.POST.get('price')
@@ -54,30 +59,24 @@ def get_or_create_learning_materials(request):
             extension=uploaded_file_info.get('extension'),
             file_size=uploaded_file_info.get('file_size'),
         )
-        return JsonResponse(status=HTTPStatus.CREATED, data=dict(id=learning_material.id, title=learning_material.title))
-
-    else:
-        return JsonResponse(status=HTTPStatus.METHOD_NOT_ALLOWED, data=dict(error='Method not allowed'))
+        return JsonResponse(status=HTTPStatus.CREATED,
+                            data=dict(id=learning_material.id, title=learning_material.title))
 
 
-def get_learning_material(learning_material_id):
-    # 업데이트 결과 조회
-    try:
-        return LearningMaterial.objects.get(id=learning_material_id, is_deleted=False)
-    except ObjectDoesNotExist:
-        return None
-    except MultipleObjectsReturned:
-        return None
+class LearningMaterialDetailView(views.APIView):
+    def get_object(self, pk):
+        try:
+            return LearningMaterial.objects.get(pk=pk)
+        except LearningMaterial.DoesNotExist:
+            raise Http404
 
-
-@api_view(['PATCH', 'DELETE'])
-def update_or_delete_learning_material(request, learning_material_id):
-    if request.method == 'PATCH':
+    def patch(self, request, learning_material_id, format=None):
         # 데이터 조회
-        learning_material = get_learning_material(learning_material_id)
+        learning_material = self.get_object(learning_material_id)
 
         if learning_material is None:
-            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning material {learning_material_id} not found'))
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST,
+                                data=dict(error=f'Learning material {learning_material_id} not found'))
 
         if 'file' in request.FILES:
             # 이미 저장된 파일이 있으면 삭제한 뒤 업로드합니다.
@@ -95,12 +94,13 @@ def update_or_delete_learning_material(request, learning_material_id):
         )
         return JsonResponse(status=200, data=dict(result='OK'))
 
-    elif request.method == 'DELETE':
+    def delete(self, request, learning_material_id, format=None):
         # 데이터 조회
-        learning_material = get_learning_material(learning_material_id)
+        learning_material = self.get_object(learning_material_id)
 
         if learning_material is None:
-            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning material {learning_material_id} not found'))
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST,
+                                data=dict(error=f'Learning material {learning_material_id} not found'))
 
         # 소프트 딜리트
         LearningMaterial.objects.filter(id=learning_material_id).update(
@@ -116,5 +116,97 @@ def update_or_delete_learning_material(request, learning_material_id):
         remove_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
         return JsonResponse(status=HTTPStatus.OK, data=dict(result='OK'))
 
+
+# 파일 다운로드 API 관련 함수
+def check_learning_material_paid(learning_material, user):
+    if user.is_superuser:
+        return True
     else:
-        return JsonResponse(status=HTTPStatus.METHOD_NOT_ALLOWED, data=dict(error='Method not allowed'))
+        orders = learning_material.orders.filter(user=user).all()
+        return any(order.status == 'PAID' for order in orders)
+
+
+def get_learning_material_file(learning_material_id, user):
+    learning_material = LearningMaterial.objects.get(pk=learning_material_id)
+
+    is_paid = check_learning_material_paid(learning_material, user)
+
+    if is_paid:
+        filename = learning_material.original_filename
+        file = get_file(learning_material.stored_filename, LEARNING_MATERIAL_STATIC_DIRECTORY)
+        return (filename, file), is_paid
+    else:
+        return (), is_paid
+
+
+def get_learning_material_file_list(learning_material_ids, user):
+    """
+    학습자료 파일 목록을 가져옵니다.
+    """
+    file_list = []
+    for id in learning_material_ids:
+        file_tuple, is_paid = get_learning_material_file(id, user)
+
+        if is_paid is False:
+            return [], JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Learning Material {id} is not allowed'))
+
+        file_list.append(file_tuple)
+
+    return file_list, None
+
+
+def get_ids_from_query(request):
+    """
+    HTTP 요청의 쿼리 스트링에서 ids 리스트를 추출합니다.
+    """
+    learning_material_ids = request.GET.get('ids')
+
+    if ',' in learning_material_ids:
+        return learning_material_ids.split(',')
+    else:
+        return [learning_material_ids]
+
+
+@decorators.api_view(['GET'])
+def download_learning_materials(request):
+    # 학습 자료 아이디 처리
+    learning_material_ids = get_ids_from_query(request)
+
+    # 파일 목록 가져오기
+    file_list, error_response = get_learning_material_file_list(learning_material_ids, request.user)
+    if error_response:
+        return error_response
+
+    # Response 구성
+    if len(file_list) == 1:
+        file = file_list[0]
+        filename = file[0]
+        response = HttpResponse(file, content_type='application/pdf;')
+    else:
+        zip_file = convert_files_into_zip(file_list)
+        filename = f'학습자료_{timezone.now().strftime("%Y-%m-%d_%H%M%S")}.zip'
+        response = HttpResponse(zip_file, content_type='application/zip')
+
+    encoded_filename = urllib.parse.quote(filename)
+    response['Content-Disposition'] = f'attachment; filename={encoded_filename}'
+    response['X-Filename'] = encoded_filename
+
+    return response
+
+
+@decorators.api_view(['GET'])
+def send_learning_materials_by_email(request):
+    # 학습 자료 아이디 처리
+    learning_material_ids = get_ids_from_query(request)
+
+    # 파일 목록 가져오기
+    file_list, error_response = get_learning_material_file_list(learning_material_ids, request.user)
+    if error_response:
+        return error_response
+
+    send_learning_material_email_async(
+        [request.user.file_receiving_email],
+        file_list,
+    )
+
+    return JsonResponse(status=HTTPStatus.OK, data=dict(result='OK'))

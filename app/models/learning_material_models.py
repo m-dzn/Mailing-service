@@ -1,5 +1,6 @@
 from django.db import models
 from app.models.abstract_models import BaseModel
+from .order_models import Order
 
 
 class LearningMaterial(BaseModel):
@@ -12,6 +13,8 @@ class LearningMaterial(BaseModel):
     stored_filename = models.CharField(max_length=255, null=True) # VARCHAR2 = 가변형 문자열 (기본 255)
     extension = models.CharField(max_length=4, null=True)
     file_size = models.BigIntegerField(null=True)
+
+    orders = models.ManyToManyField('Order', through=Order.learning_materials.through)
 
     class Meta:
         db_table = 'learning_material'

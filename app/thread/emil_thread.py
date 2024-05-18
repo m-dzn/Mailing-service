@@ -1,3 +1,4 @@
+import os
 import threading
 import logging
 from django.core.mail import EmailMessage
@@ -19,7 +20,7 @@ def send_email_with_attachments(subject, content, from_email, recipient_list, at
         email = EmailMessage(subject, content, from_email, recipient_list)
 
         for attachment in attachments:
-            email.attach(attachment[0], attachment[1], attachment[2])
+            email.attach(attachment[0], attachment[1])
 
         email.send()
         logging.info(f'Email sent successfully to {", ".join(recipient_list)}')
@@ -44,3 +45,11 @@ def send_email_async(subject, content, from_email, recipient_list, attachments=[
         logging.error(f'Failed to start email sending thread: {str(e)}')
 
 
+def send_learning_material_email_async(recipient_list, attachments=[]):
+    send_email_async(
+        'Test Email',
+        'This is a test email sent from Django.',
+        f'{os.getenv('EMAIL_HOST_USER')}',
+        recipient_list,
+        attachments
+    )
