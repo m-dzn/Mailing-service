@@ -22,193 +22,227 @@ Mailing Service | Admin
 {% endblock %}
 
 {% block scripts %}
-<script>
-    $(document).ready(function() {
-        setEventListeners();
-        getOrders();
-        // createOrder();
-        sendLearningMaterialsByEmail([5, 9]);
-    });
+    <script>
+        $(document).ready(function() {
+            setEventListeners();
+            getOrders();
+        });
 
-    function setEventListeners() {
-        const $addLearningMaterialForm = $("#add-learning-material-form");
-        $addLearningMaterialForm.on("submit", function(event) {
+        function setEventListeners() {
+            const $addLearningMaterialForm = $("#add-learning-material-form");
+            $addLearningMaterialForm.on("submit", function(event) {
+                event.preventDefault();
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: "/api/learning-materials/",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    success: function(response) {
+                        alert("학습 자료가 등록됐습니다.");
+                        $addLearningMaterialForm[0].reset();
+                    },
+                    error: function(response) {
+                        alert("학습 자료 등록 중 오류가 발생했습니다.");
+                    }
+                });
+            });
+        }
+
+        function reloadLearningMaterialList() {
+            setTimeout(() => {
+                location.href = "/admin";
+            }, 200);
+        }
+
+        function getCsrfToken() {
+            return $("meta[name='csrf-token']").attr("content");
+        }
+
+        /* Learning Material */
+        function editLearningMaterial(event) {
             event.preventDefault();
 
-            let formData = new FormData(this);
-
-            $.ajax({
-                url: "/api/learning-materials/",
-                type: "POST",
-                data: formData,
-                processData: false,
-                success: function(response) {
-                    alert("학습 자료가 등록됐습니다.");
-                    $addLearningMaterialForm[0].reset();
-                },
-                error: function(response) {
-                    alert("학습 자료 등록 중 오류가 발생했습니다.");
-                }
-            });
-        });
-    }
-
-    function reloadLearningMaterialList() {
-        setTimeout(() => {
-            location.href = "/admin";
-        }, 200);
-    }
-
-    function getCsrfToken() {
-        return $("meta[name='csrf-token']").attr("content");
-    }
-
-    /* Learning Material */
-    function editLearningMaterial(event) {
-        event.preventDefault();
-
-        const id = $(event.target).data("id");
-        const formData = new FormData(event.target);
-        const csrfToken = getCsrfToken();
-
-        $.ajax({
-            url: `/api/learning-materials/${id}`,
-            type: "PATCH",
-            data: formData,
-            processData: false,
-            contentType: false,
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", csrfToken);
-            },
-            success: function(response) {
-                alert("학습 자료가 수정됐습니다.");
-                location.reload();
-            },
-            error: function(response) {
-                alert("학습 자료 수정 중 오류가 발생했습니다.");
-            }
-        });
-    }
-
-    function removeLearningMaterial(id) {
-        if (confirm("정말 삭제하시겠습니까?")) {
-            let csrfToken = getCsrfToken();
+            const id = $(event.target).data("id");
+            const formData = new FormData(event.target);
+            const csrfToken = getCsrfToken();
 
             $.ajax({
                 url: `/api/learning-materials/${id}`,
-                type: "DELETE",
+                type: "PATCH",
+                data: formData,
+                processData: false,
+                contentType: false,
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("X-CSRFToken", csrfToken);
                 },
                 success: function(response) {
-                    alert("학습 자료가 삭제됐습니다.");
+                    alert("학습 자료가 수정됐습니다.");
                     location.reload();
                 },
                 error: function(response) {
-                    alert("학습 자료 삭제 중 오류가 발생했습니다.");
+                    alert("학습 자료 수정 중 오류가 발생했습니다.");
                 }
             });
         }
-    }
 
-    function downloadLearningMaterial(learningMaterialIds) {
-        $.ajax({
-            url: `/api/learning-materials/download?ids=${learningMaterialIds}`,
-            type: "GET",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-            xhrFields: {
-                responseType: "blob" // 응답을 Blob 형태로 받습니다.
-            },
-            success: (data, status, xhr) => {
-                // 파일을 다운로드하기 위해 임시 URL 및 <a> 태그를 생성합니다.
-                const url = window.URL.createObjectURL(data);
-                const a = document.createElement("a");
-                a.href = url;
+        function removeLearningMaterial(id) {
+            if (confirm("정말 삭제하시겠습니까?")) {
+                let csrfToken = getCsrfToken();
 
-                // HTTP 응답 헤더에서 파일명을 추출합니다.
-                const encodedFilename = xhr.getResponseHeader("X-Filename")
-                const filename = decodeURIComponent(encodedFilename);
-                a.download = filename;
-
-                // <a> 태그를 자동으로 클릭해 파일을 다운로드합니다.
-                document.body.appendChild(a);
-                a.click();
-
-                // <a> 태그를 제거합니다.
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url); // URL 오브젝트를 제거합니다.
+                $.ajax({
+                    url: `/api/learning-materials/${id}`,
+                    type: "DELETE",
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                    },
+                    success: function(response) {
+                        alert("학습 자료가 삭제됐습니다.");
+                        location.reload();
+                    },
+                    error: function(response) {
+                        alert("학습 자료 삭제 중 오류가 발생했습니다.");
+                    }
+                });
             }
-        });
-    }
+        }
 
-    function sendLearningMaterialsByEmail(learningMaterialIds) {
-        $.ajax({
-            url: `/api/learning-materials/send-mail?ids=${learningMaterialIds}`,
-            type: "GET",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-        });
-    }
+        function downloadLearningMaterial(learningMaterialIds) {
+            $.ajax({
+                url: `/api/learning-materials/download?ids=${learningMaterialIds}`,
+                type: "GET",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+                xhrFields: {
+                    responseType: "blob" // 응답을 Blob 형태로 받습니다.
+                },
+                success: (data, status, xhr) => {
+                    // 파일을 다운로드하기 위해 임시 URL 및 <a> 태그를 생성합니다.
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement("a");
+                    a.href = url;
 
-    function getLearningMaterials() {
-        $.ajax({
-            url: `/api/learning-materials`,
-            type: "GET",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-        });
-    }
+                    // HTTP 응답 헤더에서 파일명을 추출합니다.
+                    const encodedFilename = xhr.getResponseHeader("X-Filename")
+                    const filename = decodeURIComponent(encodedFilename);
+                    a.download = filename;
 
-    /* Order */
-    function createOrder() {
-        $.ajax({
-            url: `/api/orders/`,
-            type: "POST",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-            data: {
-                learning_materials: [6, 9]
-            }
-        });
-    }
+                    // <a> 태그를 자동으로 클릭해 파일을 다운로드합니다.
+                    document.body.appendChild(a);
+                    a.click();
 
-    function checkOrderPayment() {
-        const orderId = 3;
+                    // <a> 태그를 제거합니다.
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url); // URL 오브젝트를 제거합니다.
+                }
+            });
+        }
 
-        $.ajax({
-            url: `/api/orders/${orderId}/check-payment`,
-            type: "PATCH",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-        });
-    }
+        function sendLearningMaterialsByEmail(learningMaterialIds) {
+            $.ajax({
+                url: `/api/learning-materials/send-mail?ids=${learningMaterialIds}`,
+                type: "GET",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+            });
+        }
 
-    function cancelOrder() {
-        const orderId = 1;
+        function getLearningMaterials() {
+            $.ajax({
+                url: `/api/learning-materials`,
+                type: "GET",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+            });
+        }
 
-        $.ajax({
-            url: `/api/orders/${orderId}/cancel`,
-            type: "PATCH",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-        });
-    }
+        /* Order */
+        function getSelectedOrderIds() {
+            const $selectedOrders = $("#order-payment-table input:checked");
+            return $selectedOrders.map(function() {
+                return $(this).data("id");
+            }).get();
+        }
 
-    function getOrders() {
-        $.ajax({
-            url: `/api/orders`,
-            type: "GET",
-            beforeSend: function(xhr) {
-                xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
-            },
-        });
-    }
-</script>
+        function checkOrderPayment() {
+            const orderIds = getSelectedOrderIds();
+
+            if (orderIds.length === 0) return;
+
+            $.ajax({
+                url: `/api/orders/check-payment?ids=${orderIds}`,
+                type: "PATCH",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+                success: () => {
+                    getOrders();
+                }
+            });
+        }
+
+        function cancelOrders() {
+            const orderIds = getSelectedOrderIds();
+
+            if (orderIds.length === 0) return;
+
+            $.ajax({
+                url: `/api/orders/cancel?ids=${orderIds}`,
+                type: "PATCH",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+                success: () => {
+                    getOrders();
+                }
+            });
+        }
+
+        const ORDER_STATUS = {
+            REQUESTED: "요청",
+            PAID: "결제 완료",
+            CANCELED: "취소",
+        }
+        function getOrders() {
+            $.ajax({
+                url: `/api/orders`,
+                type: "GET",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+                success: (data) => {
+                    const table = $("#order-payment-table tbody");
+                    table.empty();
+
+                    for (const item of data) {
+                        const numberOfFiles = item.learning_materials.length;
+                        const paidAt = item.paid_at ? dayjs(item.paid_at).format("YYYY-MM-DD hh:mm") : "";
+
+                        table.append(`
+                            <tr>
+                                <td>
+                                    <input type="checkbox" data-id="${item.id}" />
+                                </td>
+                                <td>
+                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                        <img class="avatar sm" src="${item.user?.avatar}" alt="avatar">
+                                        ${item.depositor}
+                                    </div>
+                                </td>
+                                <td>${item.total_price.toLocaleString("ko-kr")}원</td>
+                                <td>${numberOfFiles}개</td>
+                                <td>${ORDER_STATUS[item.status]}</td>
+                                <td style="color: var(--color-font-sub-default);">${paidAt}</td>
+                            </tr>
+                        `);
+                    }
+                }
+            });
+        }
+    </script>
 {% endblock %}

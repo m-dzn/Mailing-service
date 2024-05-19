@@ -24,6 +24,7 @@
             <section id="lm-list-tab" class="tab-pane">
                 {% for learning_material in learning_materials %}
                     <article>
+                        <div style="margin: 20px">제목, 가격, 파일명, 용량, 삭제 여부, 등록일</div>
                         <div>{{ learning_material.title }}</div>
                         <div>{{ learning_material.description }}</div>
                         <div>{{ learning_material.price|intcomma }}원</div>

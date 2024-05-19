@@ -10,6 +10,11 @@
     --color-font-sub-default: #999999;
 
     --color-primary: #1596f4;
+    --color-primary-on: #ffffff;
+    --color-success: #059669;
+    --color-success-on: #ffffff;
+    --color-error: #ee1d51;
+    --color-error-on: #ffffff;
 
     /* size */
     --border-radius-sm: 6px;

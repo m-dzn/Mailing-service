@@ -64,5 +64,23 @@ Mailing Service | Home
                 $('.spinner-border').hide();
             }
         });
+
+        /* Order */
+        function createOrder() {
+            const depositor = "테스터";
+            const learning_materials = [6, 9];
+
+            $.ajax({
+                url: `/api/orders/`,
+                type: "POST",
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
+                },
+                data: {
+                    depositor,
+                    learning_materials
+                }
+            });
+        }
     </script>
 {% endblock %}

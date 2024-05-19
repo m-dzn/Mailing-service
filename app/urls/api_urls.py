@@ -13,7 +13,7 @@ urlpatterns = [
     path('learning-materials/<int:learning_material_id>', apis.LearningMaterialDetailView.as_view()),
     path('learning-materials/download', apis.download_learning_materials),
     path('learning-materials/send-mail', apis.send_learning_materials_by_email),
-    path('orders/<int:order_id>/check-payment', apis.check_order_payment),
-    path('orders/<int:order_id>/cancel', apis.cancel_order),
+    path('orders/check-payment', apis.check_order_payment),
+    path('orders/cancel', apis.cancel_order),
     path('', include(router.urls)),
 ]

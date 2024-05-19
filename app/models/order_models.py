@@ -11,6 +11,7 @@ class Order(BaseModel):
         'CANCELED': 'CANCELED',
     }
 
+    depositor = models.CharField(max_length=20)
     total_price = models.IntegerField()
     status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default=ORDER_STATUS_CHOICES.get('REQUESTED'))
     paid_at = models.DateTimeField(null=True)

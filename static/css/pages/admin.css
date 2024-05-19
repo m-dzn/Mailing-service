@@ -19,12 +19,9 @@ main {
     flex: 1;
     padding: 40px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(640px, 1fr));
     row-gap: 40px;
     column-gap: 64px;
-}
-.admin-main-grid > *:nth-child(3) {
-    grid-row: 1 / span 2
 }
 
 /* ---------- Learning material Card ---------- */

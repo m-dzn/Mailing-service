@@ -1,5 +1,6 @@
 import os
 from http import HTTPStatus
+from django.db import transaction
 from django.http import JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -7,8 +8,8 @@ from rest_framework import decorators, filters, pagination, permissions, viewset
 
 from app.models import Order, LearningMaterial
 from app.serializers import OrderSerializer
-from app.thread import send_email_async, send_learning_material_email_async
-from app.utils import get_file
+from app.thread import send_learning_material_email_async
+from app.utils import get_file, get_ids_from_request
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -37,6 +38,7 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # 새 주문 생성
         order = Order.objects.create(
+            depositor=request.POST.get('depositor'),
             total_price=total_price,
             user=request.user,
         )
@@ -60,45 +62,54 @@ def get_order(order_id, user):
 
 
 @decorators.api_view(['PATCH'])
-def check_order_payment(request, order_id):
+def check_order_payment(request):
     if request.method == 'PATCH':
-        # 데이터 조회
-        order = get_order(order_id, request.user)
+        order_ids = get_ids_from_request(request)
 
-        if order is None:
-            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Order {order_id} not found'))
+        for order_id in order_ids:
+            with transaction.atomic():
+                # 데이터 조회
+                order = get_order(order_id, request.user)
 
-        Order.objects.filter(id=order_id).update(
-            status=Order.ORDER_STATUS_CHOICES.get('PAID'),
-            paid_at=timezone.now()
-        )
+                if order is None:
+                    return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Order {order_id} not found'))
 
-        learning_materials = order.learning_materials.all()
+                Order.objects.filter(id=order_id).update(
+                    status=Order.ORDER_STATUS_CHOICES.get('PAID'),
+                    paid_at=timezone.now()
+                )
 
-        file_list = []
-        for learning_material in learning_materials:
-            file = get_file(learning_material.stored_filename, 'learning-material')
-            file_list.append((learning_material.original_filename, file))
+                learning_materials = order.learning_materials.all()
 
-        send_learning_material_email_async(
-            [request.user.file_receiving_email],
-            file_list,
-        )
+                file_list = []
+                for learning_material in learning_materials:
+                    file = get_file(learning_material.stored_filename, 'learning-material')
+                    file_list.append((learning_material.original_filename, file))
+
+                send_learning_material_email_async(
+                    [request.user.file_receiving_email],
+                    file_list,
+                )
 
         return JsonResponse(status=200, data=dict(result='OK'))
 
 
 @decorators.api_view(['PATCH'])
-def cancel_order(request, order_id):
+def cancel_order(request):
     if request.method == 'PATCH':
-        # 데이터 조회
-        order = get_order(order_id, request.user)
+        order_ids = get_ids_from_request(request)
 
-        if order is None:
-            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Order {order_id} not found'))
+        for order_id in order_ids:
+            with transaction.atomic():
+                # 데이터 조회
+                order = get_order(order_id, request.user)
 
-        Order.objects.filter(id=order_id).update(
-            status=Order.ORDER_STATUS_CHOICES.get('CANCELED'),
-            canceled_at=timezone.now(),
-        )
+                if order is None:
+                    return JsonResponse(status=HTTPStatus.BAD_REQUEST, data=dict(error=f'Order {order_id} not found'))
+
+                Order.objects.filter(id=order_id).update(
+                    status=Order.ORDER_STATUS_CHOICES.get('CANCELED'),
+                    canceled_at=timezone.now(),
+                )
+
         return JsonResponse(status=200, data=dict(result='OK'))

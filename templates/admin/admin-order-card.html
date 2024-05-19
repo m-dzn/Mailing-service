@@ -4,5 +4,27 @@
             <h3 class="card-header__title">주문/결제</h3>
             <p class="card-header__description">고객의 주문/결제 목록을 볼 수 있습니다.</p>
         </div>
+        <div class="card-header__actions">
+            <button class="button outlined success" onclick="checkOrderPayment();">결제 체크</button>
+            <button class="button outlined error" onclick="cancelOrders();">취소</button>
+        </div>
     </header>
+
+    <div class="card-body">
+        <table class="table" id="order-payment-table">
+            <thead>
+                <tr>
+                    <th width="52">
+                        <input type="checkbox" />
+                    </th>
+                    <th width="120"><i class="fa-regular fa-user"></i> 입금자</th>
+                    <th width="100"><i class="fa-solid fa-won-sign"></i> 주문 금액</th>
+                    <th width="72"><i class="fa-regular fa-file-pdf"></i> 자료</th>
+                    <th width="100"><i class="fa-regular fa-flag"></i> 상태</th>
+                    <th><i class="fa-regular fa-calendar"></i> 결제 확인</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
 </article>
