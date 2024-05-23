@@ -23,19 +23,63 @@
 
             <section id="lm-list-tab" class="tab-pane">
                 {% for learning_material in learning_materials %}
-                    <article>
-                        <div style="margin: 20px">제목, 가격, 파일명, 용량, 삭제 여부, 등록일</div>
-                        <div>{{ learning_material.title }}</div>
-                        <div>{{ learning_material.description }}</div>
-                        <div>{{ learning_material.price|intcomma }}원</div>
-                        <div>{{ learning_material.original_filename }}</div>
-                        <div>{{ learning_material.file_size|filesizeformat }}</div>
-                        <div>{{ learning_material.is_deleted }}</div>
-                        <div>{{ learning_material.extension }}</div>
-                        <div>삭제 여부 true/false</div>
+                    <article id="learning-material-{{ learning_material.id }}" class="learning-material-item">
+                        <div class="learning-material-item__body">
+                            <div class="learning-material-item__icon">
+                                <img src="/static/images/pdf-file.png" alt="file icon">
+                            </div>
+                            <div class="learning-material-item__title-box">
+                                <div class="learning-material-item__title">{{ learning_material.title }}</div>
+                                <div class="learning-material-item__description">{{ learning_material.description }}</div>
+                            </div>
+                            <div class="learning-material-item__actions">
+                                <button class="icon-button link ghost" onclick="openLearningMaterialEditForm({{ learning_material.id }})">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7 17.013L11.413 16.998L21.045 7.45802C21.423 7.08002 21.631 6.57802 21.631 6.04402C21.631 5.51002 21.423 5.00802 21.045 4.63002L19.459 3.04402C18.703 2.28802 17.384 2.29202 16.634 3.04102L7 12.583V17.013ZM18.045 4.45802L19.634 6.04102L18.037 7.62302L16.451 6.03802L18.045 4.45802ZM9 13.417L15.03 7.44402L16.616 9.03002L10.587 15.001L9 15.006V13.417Z" fill="currentColor"/>
+                                        <path d="M5 21H19C20.103 21 21 20.103 21 19V10.332L19 12.332V19H8.158C8.132 19 8.105 19.01 8.079 19.01C8.046 19.01 8.013 19.001 7.979 19H5V5H11.847L13.847 3H5C3.897 3 3 3.897 3 5V19C3 20.103 3.897 21 5 21Z" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-button error ghost" onclick="removeLearningMaterial({{ learning_material.id }})">
+                                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM19 4H15.5L14.5 3H9.5L8.5 4H5V6H19V4Z" fill="currentColor"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="learning-material-item__price">{{ learning_material.price|intcomma }}원</div>
 
-                        <button>수정</button>
-                        <button onclick="removeLearningMaterial({{ learning_material.id }})">삭제</button>
+                        <div class="learning-material-item__sub-info">
+                            <div class="data-field">
+                                <div class="data-field__label">등록일</div>
+                                <p class="data-field__value">
+                                    {{ learning_material.created_at|date:"Y-m-d" }}
+                                </p>
+                            </div>
+                            <div class="data-field">
+                                <div class="data-field__label">파일명</div>
+                                <p class="data-field__value">
+                                    {{ learning_material.original_filename }}
+                                </p>
+                            </div>
+                            <div class="data-field">
+                                <div class="data-field__label">용량</div>
+                                <p class="data-field__value">
+                                    {{ learning_material.file_size|filesizeformat }}
+                                </p>
+                            </div>
+                            <div class="data-field">
+                                <div class="data-field__label">확장자</div>
+                                <p class="data-field__value learning-material-item__extension">
+                                    {{ learning_material.extension }}
+                                </p>
+                            </div>
+                            <div class="data-field">
+                                <div class="data-field__label">삭제 여부</div>
+                                <p class="data-field__value">
+                                    {{ learning_material.is_deleted }}
+                                </p>
+                            </div>
+                        </div>
 
                         {% include 'admin/learning-material-form.html' with form_id='edit-learning-material-form-'|addstr:learning_material.id submit_button_label='수정' onsubmit='editLearningMaterial(event);' %}
                     </article>

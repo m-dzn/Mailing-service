@@ -4,7 +4,6 @@
     width: 32px;
     height: 32px;
     border-radius: 100%;
-    border: 1px solid var(--color-border-default);
 }
 .avatar.sm {
     width: 24px;
@@ -44,6 +43,10 @@
     color: var(--color-font-sub-default);
     margin: 8px 0 0;
     font-size: 13px;
+}
+.card-header__actions {
+    display: flex;
+    gap: 12px;
 }
 
 .card-body {
@@ -207,7 +210,6 @@
 }
 .data-field__value {
     margin: 0;
-    min-height: 48px;
 }
 
 /* ---------- Table ---------- */
@@ -237,4 +239,32 @@
 .table th {
     color: var(--color-font-sub-default);
     font-weight: 400;
+}
+
+/* ---------- Tag ---------- */
+.tag {
+    --component-tag-color-background: var(--color-primary);
+    --component-tag-color-font: var(--color-primary-on);
+
+    background: var(--component-tag-color-background);
+    color: var(--component-tag-color-font);
+    padding: 5px 12px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    text-align: center;
+}
+
+.tag.success {
+    --component-tag-color-background: var(--color-success);
+    --component-tag-color-font: var(--color-success-on);
+}
+
+.tag.error {
+    --component-tag-color-background: var(--color-error);
+    --component-tag-color-font: var(--color-error-on);
+}
+
+.tag.disabled {
+    --component-tag-color-background: var(--color-disabled);
+    --component-tag-color-font: var(--color-disabled-on);
 }

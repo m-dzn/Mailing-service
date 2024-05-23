@@ -1,0 +1,33 @@
+<div class="home-nav inner">
+    <ul class="home-nav__tab">
+        <li>
+            <a class="button {% if purchased != 'none' %}disabled{% endif %}" href="/">전체</a>
+        </li>
+        <li>
+            <a class="button {% if purchased != 'purchased' %}disabled{% endif %}" href="/?purchased=purchased">구매</a>
+        </li>
+        <li>
+            <a class="button {% if purchased != 'unpurchased' %}disabled{% endif %}" href="/?purchased=unpurchased">미구매</a>
+        </li>
+    </ul>
+
+    <div class="home-nav__actions">
+        <button id="download-button" class="icon-button" onclick="downloadLearningMaterial(event);">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                <g id="SVGRepo_iconCarrier">
+                    <g id="Interface / Download">
+                        <path id="Vector" d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12" stroke="#f1f1f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </g>
+                </g>
+            </svg>
+        </button>
+
+        <button id="send-mail-button" class="icon-button" onclick="sendLearningMaterialsByEmail(event);">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 10.99L4 6H20ZM20 18H4V8L12 13L20 8V18Z" fill="currentColor"/>
+            </svg>
+        </button>
+    </div>
+</div>

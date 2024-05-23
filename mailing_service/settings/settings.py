@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.humanize',
+    'django_filters',
+
+    # Third parties
     'rest_framework',
 
     # Auth

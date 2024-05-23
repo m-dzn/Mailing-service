@@ -1,22 +1,12 @@
-from django.shortcuts import render
-from django.views.generic.list import ListView
+from django.shortcuts import render, redirect
 
 from app.models import LearningMaterial
 
 
-class LearningMaterialView(ListView):
-    model = LearningMaterial
-    paginate_by = 2
-    context_object_name = 'learning_materials'
-    template_name = 'home/home.html'
-    ordering = ['-id']
-
-    def get_queryset(self, **kwargs):
-        qs = super().get_queryset(**kwargs)
-        return qs.filter(is_deleted=False)
-
-
 def admin(request):
+    if not request.user.is_superuser:
+        return redirect('/')
+
     learning_materials = (
         LearningMaterial.objects.filter(is_deleted=False).all()
         .order_by('-id')

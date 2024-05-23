@@ -1,0 +1,47 @@
+{% load humanize %}
+{% load custom_filters %}
+
+<section id="learning-material-list" class="learning-material-list inner infinite-container">
+    {% for learning_material in learning_materials %}
+            <article id="learning-material-{{ learning_material.id }}" data-purchased="{% if learning_material.orders|length >= 1 %}purchased{% endif %}" class="learning-material-item infinite-item" onclick="onClickLearningMaterialItem(event);">
+
+                <div class="learning-material-item__body">
+                    <div class="learning-material-item__icon">
+                        <img src="/static/images/pdf-file.png" alt="file icon">
+                    </div>
+                    <div class="learning-material-item__title-box">
+                        <h3 class="learning-material-item__title">{{ learning_material.title }}</h3>
+                        <p class="learning-material-item__description">{{ learning_material.description }}</p>
+                    </div>
+                </div>
+
+                <footer class="learning-material-item__footer">
+                    <div class="learning-material-item__price"><strong>{{ learning_material.price|intcomma }}</strong>원</div>
+                    <div class="learning-material-item__sub-info">
+                        <div>
+                            {% if learning_material.orders|length >= 1 %}
+                                <div class="tag success learning-material-item__status">구매</div>
+                            {% else %}
+                                <div class="tag disabled learning-material-item__status">미구매</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </footer>
+
+                <label class="learning-material-item__checkbox jello-checkbox
+                            {% if learning_material.orders|length >= 1 %}success{% endif %}">
+                    <input class="jello-checkbox__input" type="checkbox" data-id="{{ learning_material.id }}">
+                    <div class="jello-checkbox__checkmark"></div>
+                </label>
+            </article>
+    {% endfor %}
+</section>
+
+{% if page_obj.has_next %}
+    <a class="infinite-more-link" href="?page={{ page_obj.next_page_number }}">더보기</a>
+{% endif %}
+<div class="d-flex justify-content-center" style="display:none;">
+    <div class="spinner-border" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+</div>

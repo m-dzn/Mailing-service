@@ -1,23 +1,29 @@
 {% load socialaccount %}
 <nav class="top-nav">
-  <div>
-      메일링 서비스 로고
-  </div>
-  <ul class="top-nav__user-menu">
-      {% if not user.is_authenticated %}
-      <li>
-        <a href="{% provider_login_url 'google' %}?next=/">로그인</a>
-      </li>
-      {% else %}
-      <li>
-        <a href="#">마이 페이지</a>
-      </li>
-    <li>
-      <img class="avatar" src="{{ user.avatar }}" alt="avatar"/>
-    </li>
-      <li>
-        <a href="{% url 'logout' %}">로그아웃</a>
-      </li>
-      {% endif %}
-  </ul>
+    <div>
+        <a href="/">메일링 서비스 로고</a>
+    </div>
+    <div>
+        <ul class="top-nav__user-menu">
+            {% if not user.is_authenticated %}
+                <li>
+                    <a class="button" href="{% provider_login_url 'google' %}?next=/">로그인</a>
+                </li>
+            {% else %}
+                {% if user.is_superuser %}
+                    <li>
+                        <a href="/admin">관리 페이지</a>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="#">
+                        <img class="avatar" src="{{ user.avatar }}" alt="avatar"/>
+                    </a>
+                </li>
+                <li>
+                    <a class="button secondary" href="{% url 'logout' %}">로그아웃</a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
 </nav>

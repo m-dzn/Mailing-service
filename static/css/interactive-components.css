@@ -1,0 +1,243 @@
+/* ---------- Button ---------- */
+.button {
+    --component-button-color-background: var(--color-primary);
+    --component-button-color-font: var(--color-primary-on);
+    --component-button-color-border: var(--component-button-color-background);
+
+    background-color: var(--component-button-color-background);
+    color: var(--component-button-color-font);
+
+    height: 40px;
+    padding: 8px 24px;
+    box-sizing: border-box;
+
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+
+    border: 1px solid var(--component-button-color-border);
+    border-radius: var(--border-radius-rounded);
+    outline: none;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+    transition: background 0.2s ease-out, transform 0.1s ease-out;
+}
+.button:hover {
+    --component-button-color-background: var(--color-primary-dark);
+}
+.button.full {
+    width: 100%;
+}
+
+/* 유형 */
+.button.outlined {
+    background-color: transparent;
+    color: var(--component-button-color-background);
+}
+.button.outlined:hover {
+    background-color: var(--component-button-color-background);
+    color: var(--component-button-color-font);
+}
+
+.button.text {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--component-button-color-background);
+}
+.button.text:hover {
+    filter: brightness(0.8);
+}
+
+.button.disabled {
+    --component-button-color-background: var(--color-font-sub-default);
+
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--component-button-color-background);
+}
+.button.disabled:hover {
+    filter: brightness(0.8);
+}
+
+.button:active {
+    transform: translateY(3px);
+    box-shadow: 0px 0px var(--main-color);
+}
+
+/* 색상 */
+.button.secondary {
+    --component-button-color-background: var(--color-secondary);
+    --component-button-color-font: var(--color-secondary-on);
+}
+
+.button.success {
+    --component-button-color-background: var(--color-success);
+    --component-button-color-font: var(--color-success-on);
+}
+
+.button.error {
+    --component-button-color-background: var(--color-error);
+    --component-button-color-font: var(--color-error-on);
+}
+
+/* ---------- Icon Button ---------- */
+.icon-button {
+    --component-icon-button-color-background: var(--color-primary);
+    --component-icon-button-color-font: var(--color-primary-on);
+
+    background: var(--component-icon-button-color-background);
+    color: var(--component-icon-button-color-font);
+
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+
+    line-height: 1;
+
+    cursor: pointer;
+    filter: drop-shadow(0 0 10px rgba(59, 190, 230, 0));
+}
+.icon-button:hover {
+    --component-icon-button-color-background: var(--color-primary-dark);
+}
+
+.icon-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-button.loading::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 100%;
+  height: 100%;
+  border: 3.5px solid transparent;
+  border-top: 3.5px solid var(--color-primary);
+  border-right: 3.5px solid var(--color-primary);
+  border-radius: 50%;
+  animation: loading-animation 2s linear infinite;
+}
+
+@keyframes loading-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 유형 */
+.icon-button.ghost {
+    background: transparent;
+    color: var(--component-icon-button-color-background);
+}
+.icon-button.ghost:hover {
+    background: var(--component-icon-button-color-background);
+    color: var(--component-icon-button-color-font);
+}
+
+/* 색상 */
+.icon-button.link {
+    --component-icon-button-color-background: var(--color-link);
+    --component-icon-button-color-font: var(--color-link-on);
+}
+.icon-button.error {
+    --component-icon-button-color-background: var(--color-error);
+    --component-icon-button-color-font: var(--color-error-on);
+}
+
+/* ---------- Jello Checkbox ---------- */
+.jello-checkbox {
+    --component-jello-checkbox-color-background: var(--color-link);
+
+    position: relative;
+    display: block;
+    cursor: pointer;
+    font-size: 16px;
+    user-select: none;
+}
+.jello-checkbox.success {
+    --component-jello-checkbox-color-background: var(--color-success);
+}
+
+/* Jello Checkbox : 인풋 */
+.jello-checkbox__input {
+    display: none;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+/* Jello Checkbox : 커스텀 체크박스 */
+.jello-checkbox__checkmark {
+    background-color: var(--color-background);
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+}
+
+.jello-checkbox__input:checked ~ .jello-checkbox__checkmark {
+    background-color: var(--component-jello-checkbox-color-background);
+    animation: jello-horizontal 0.6s both;
+}
+
+.jello-checkbox__checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.jello-checkbox__input:checked ~ .jello-checkbox__checkmark:after {
+    display: block;
+}
+
+.jello-checkbox__checkmark:after {
+    left: 0.45em;
+    top: 0.25em;
+    width: 0.25em;
+    height: 0.5em;
+    border: solid white;
+    border-width: 0 0.15em 0.15em 0;
+    transform: rotate(45deg);
+}
+
+/* Jello Checkbox : 애니메이션 */
+@keyframes jello-horizontal {
+    0% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+
+    10% {
+        -webkit-transform: scale3d(1.25, 0.75, 1);
+        transform: scale3d(1.25, 0.75, 1);
+    }
+
+    20% {
+        -webkit-transform: scale3d(0.75, 1.25, 1);
+        transform: scale3d(0.75, 1.25, 1);
+    }
+
+    50% {
+        -webkit-transform: scale3d(1.15, 0.85, 1);
+        transform: scale3d(1.15, 0.85, 1);
+    }
+
+    65% {
+        -webkit-transform: scale3d(0.95, 1.05, 1);
+        transform: scale3d(0.95, 1.05, 1);
+    }
+
+    100% {
+        -webkit-transform: scale3d(1, 1, 1);
+        transform: scale3d(1, 1, 1);
+    }
+}

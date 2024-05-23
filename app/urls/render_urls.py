@@ -1,9 +1,9 @@
 from django.urls import path
 
-from app import views
+from app import apis, views
 
 urlpatterns = [
-    path('', views.LearningMaterialView.as_view(), name='home'),
+    path('', apis.LearningMaterialViewSet.as_view({'get': 'list'}), name='home'),
     path('admin/', views.admin, name='admin'),
     path('logout/', views.logout_view, name='logout'),
 ]
