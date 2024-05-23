@@ -259,6 +259,11 @@
     --component-tag-color-font: var(--color-success-on);
 }
 
+.tag.link {
+    --component-tag-color-background: var(--color-link);
+    --component-tag-color-font: var(--color-link-on);
+}
+
 .tag.error {
     --component-tag-color-background: var(--color-error);
     --component-tag-color-font: var(--color-error-on);

@@ -1,7 +1,7 @@
 import urllib.parse
 from http import HTTPStatus
 from django.http import JsonResponse, Http404, HttpResponse
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, Case, When, IntegerField
 from django.shortcuts import render
 from django.utils import timezone
 from rest_framework import decorators, filters, pagination, permissions, views, viewsets
@@ -38,27 +38,34 @@ class LearningMaterialViewSet(viewsets.ModelViewSet):
         is_superuser = self.request.user.is_superuser
         is_home = self.request.path == '/'
 
+        # 현재 로그인 된 유저 처리
+        current_user = self.request.user if not self.request.user.is_anonymous else None
+
         if is_superuser and not is_home:
             queryset = LearningMaterial.objects.all()
         else:
             queryset = LearningMaterial.objects.filter(is_deleted=False)
 
-            if self.request.user.is_anonymous:
-                current_user = None
-            else:
-                current_user = self.request.user
-
             # 유저 주문 필터링
-            order_queryset = Order.objects.filter(user=current_user, status=Order.ORDER_STATUS_CHOICES.get('PAID'))
+            order_queryset = Order.objects.filter(user=current_user)
             prefetch = Prefetch('orders', queryset=order_queryset)
             queryset = queryset.prefetch_related(prefetch)
+
+            queryset = queryset.annotate(
+                num_paid_orders=Count(
+                    Case(When(orders__status='PAID', order__user=current_user, then=1), output_field=IntegerField())),
+                num_requested_orders=Count(
+                    Case(When(orders__status='REQUESTED', order__user=current_user, then=1), output_field=IntegerField()))
+            )
 
             # 구매 여부 필터링
             purchased = self.request.query_params.get('purchased', None)
             if purchased == 'purchased':
-                queryset = queryset.annotate(num_orders=Count('orders')).filter(num_orders__gt=0)
+                queryset = queryset.filter(num_paid_orders__gt=0)
             elif purchased == 'unpurchased':
-                queryset = queryset.annotate(num_orders=Count('orders')).filter(num_orders=0)
+                queryset = queryset.filter(num_paid_orders=0, num_requested_orders=0)
+            elif purchased == 'requested':
+                queryset = queryset.filter(num_requested_orders__gt=0)
 
         return queryset
 

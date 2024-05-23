@@ -9,6 +9,9 @@
         <li>
             <a class="button {% if purchased != 'unpurchased' %}disabled{% endif %}" href="/?purchased=unpurchased">미구매</a>
         </li>
+        <li>
+            <a class="button {% if purchased != 'requested' %}disabled{% endif %}" href="/?purchased=requested">주문</a>
+        </li>
     </ul>
 
     <div class="home-nav__actions">

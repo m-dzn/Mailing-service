@@ -93,6 +93,9 @@ Mailing Service | Home
                 data: {
                     depositor,
                     learning_materials: selectedLearningMaterialIds
+                },
+                success: () => {
+                    location.reload();
                 }
             });
         }
@@ -167,6 +170,9 @@ Mailing Service | Home
         /* etc. */
         function onClickLearningMaterialItem(event) {
             const $learningMaterial = $(event.target).closest(".learning-material-item");
+
+            if ($learningMaterial.data("purchased") === "requested") return;
+
             const $checkbox = $learningMaterial.find(".jello-checkbox__input");
             $checkbox.prop('checked', !$checkbox.prop('checked'));
 

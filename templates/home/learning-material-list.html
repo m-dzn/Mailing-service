@@ -3,7 +3,7 @@
 
 <section id="learning-material-list" class="learning-material-list inner infinite-container">
     {% for learning_material in learning_materials %}
-            <article id="learning-material-{{ learning_material.id }}" data-purchased="{% if learning_material.orders|length >= 1 %}purchased{% endif %}" class="learning-material-item infinite-item" onclick="onClickLearningMaterialItem(event);">
+            <article id="learning-material-{{ learning_material.id }}" data-purchased="{% if learning_material.num_paid_orders >= 1 %}purchased{% elif learning_material.num_requested_orders >= 1 %}requested{% endif %}" class="learning-material-item infinite-item" onclick="onClickLearningMaterialItem(event);">
 
                 <div class="learning-material-item__body">
                     <div class="learning-material-item__icon">
@@ -19,8 +19,10 @@
                     <div class="learning-material-item__price"><strong>{{ learning_material.price|intcomma }}</strong>원</div>
                     <div class="learning-material-item__sub-info">
                         <div>
-                            {% if learning_material.orders|length >= 1 %}
+                            {% if learning_material.num_paid_orders >= 1 %}
                                 <div class="tag success learning-material-item__status">구매</div>
+                            {% elif learning_material.num_requested_orders >= 1 %}
+                                <div class="tag link learning-material-item__status">주문</div>
                             {% else %}
                                 <div class="tag disabled learning-material-item__status">미구매</div>
                             {% endif %}
@@ -29,8 +31,8 @@
                 </footer>
 
                 <label class="learning-material-item__checkbox jello-checkbox
-                            {% if learning_material.orders|length >= 1 %}success{% endif %}">
-                    <input class="jello-checkbox__input" type="checkbox" data-id="{{ learning_material.id }}">
+                            {% if learning_material.num_paid_orders >= 1 %}success{% endif %}">
+                    <input class="jello-checkbox__input" type="checkbox" data-id="{{ learning_material.id }}" disabled>
                     <div class="jello-checkbox__checkmark"></div>
                 </label>
             </article>

@@ -57,6 +57,9 @@ main {
 
     cursor: pointer;
 }
+.learning-material-item[data-purchased="requested"] {
+    cursor: not-allowed;
+}
 
 .learning-material-item__checkbox {
     position: absolute;
