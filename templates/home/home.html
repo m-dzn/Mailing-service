@@ -141,7 +141,11 @@ Mailing Service | Home
                     // <a> 태그를 제거합니다.
                     document.body.removeChild(a);
                     window.URL.revokeObjectURL(url); // URL 오브젝트를 제거합니다.
-
+                },
+                error: () => {
+                    alert("선택한 파일을 다운로드할 수 없습니다.");
+                },
+                complete: () => {
                     // 버튼 로딩 애니메이션을 종료합니다.
                     $button.removeClass("loading");
                 }
@@ -160,7 +164,10 @@ Mailing Service | Home
                 beforeSend: function(xhr) {
                     xhr.setRequestHeader("X-CSRFToken", getCsrfToken());
                 },
-                success: () => {
+                error: () => {
+                    alert("선택한 파일을 메일로 보낼 수 없습니다.");
+                },
+                complete: () => {
                     // 버튼 로딩 애니메이션을 종료합니다.
                     $button.removeClass("loading");
                 }
